@@ -1,8 +1,15 @@
-####### Script start   ##########
-
 #!/bin/bash
 # $1 domain
 # $2 email
+
+if [ -z "$2" ]; then
+   echo -e "Parameters are missing..
+\$1 : domain
+\$2 : user_delegate\n"
+  exit
+fi
+
+basic(){
 /opt/zimbra/bin/zmprov ma $2 zimbraIsDelegatedAdminAccount TRUE
 /opt/zimbra/bin/zmprov ma $2 zimbraAdminConsoleUIComponents cartBlancheUI zimbraAdminConsoleUIComponents domainListView zimbraAdminConsoleUIComponents accountListView zimbraAdminConsoleUIComponents DLListView
 /opt/zimbra/bin/zmprov ma $2 zimbraDomainAdminMaxMailQuota 0
@@ -34,6 +41,11 @@
 /opt/zimbra/bin/zmprov grantRight account $2 usr $2 +setAccountPassword
 /opt/zimbra/bin/zmprov grantRight account $2 usr $2 +viewAccountAdminUI
 /opt/zimbra/bin/zmprov grantRight account $2 usr $2 +configureQuota
+}
 
-####### Script end  ##########
-#/opt/zimbra/bin/zmprov grr domain  usr delegatedadmin@example.com adminConsoleMailQueueRights
+extend(){
+/opt/zimbra/bin/zmprov grr domain $1 usr $2 adminConsoleMailQueueRights
+}
+
+basic
+#extend
