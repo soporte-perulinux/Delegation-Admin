@@ -9,6 +9,7 @@ if [ -z "$2" ]; then
   exit
 fi
 
+#DOCUMENTATION:  /opt/zimbra/docs/* | /opt/zimbra/docs/rights.txt
 basic(){
 /opt/zimbra/bin/zmprov ma $2 zimbraIsDelegatedAdminAccount TRUE
 /opt/zimbra/bin/zmprov ma $2 zimbraAdminConsoleUIComponents cartBlancheUI zimbraAdminConsoleUIComponents domainListView zimbraAdminConsoleUIComponents accountListView zimbraAdminConsoleUIComponents DLListView
@@ -42,10 +43,18 @@ basic(){
 /opt/zimbra/bin/zmprov grantRight account $2 usr $2 +viewAccountAdminUI
 /opt/zimbra/bin/zmprov grantRight account $2 usr $2 +configureQuota
 }
-
-extend(){
-/opt/zimbra/bin/zmprov grr domain $1 usr $2 adminConsoleMailQueueRights
+viewDomainQuotaUsage(){
+/opt/zimbra/bin/zmprov grantRight domain $1 usr $2 +getDomainQuotaUsage
+}
+viewAllMailQueue(){
+/opt/zimbra/bin/zmprov grr global usr $2 +adminConsoleMailQueueRights
 }
 
+#=======================
+main(){
 basic
-#extend
+viewDomainQuotaUsage
+#viewAllMailQueue
+}
+
+main
