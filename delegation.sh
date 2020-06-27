@@ -1,60 +1,72 @@
 #!/bin/bash
-# $1 domain
-# $2 email
 
-if [ -z "$2" ]; then
-   echo -e "Parameters are missing..
-\$1 : domain
-\$2 : user_delegate\n"
+DOMAIN="${1}"
+ACCOUNT="${2}"
+ZMPROV="/opt/zimbra/bin/zmprov"
+
+if [ -z "$DOMAIN" ]; then
+  echo -e "Parameters are missing..
+  \$1 : domain
+  \$2 : user_delegate\n"
   exit
 fi
 
-#DOCUMENTATION:  /opt/zimbra/docs/* | /opt/zimbra/docs/rights.txt
 basic(){
-/opt/zimbra/bin/zmprov ma $2 zimbraIsDelegatedAdminAccount TRUE
-/opt/zimbra/bin/zmprov ma $2 zimbraAdminConsoleUIComponents cartBlancheUI zimbraAdminConsoleUIComponents domainListView zimbraAdminConsoleUIComponents accountListView zimbraAdminConsoleUIComponents DLListView
-/opt/zimbra/bin/zmprov ma $2 zimbraDomainAdminMaxMailQuota 0
+$ZMPROV ma $ACCOUNT zimbraIsDelegatedAdminAccount TRUE
+$ZMPROV ma $ACCOUNT zimbraAdminConsoleUIComponents cartBlancheUI zimbraAdminConsoleUIComponents domainListView zimbraAdminConsoleUIComponents accountListView zimbraAdminConsoleUIComponents DLListView
 
-/opt/zimbra/bin/zmprov grr global usr $2 +listZimlet
-/opt/zimbra/bin/zmprov grr global usr $2 +modifyZimlet
-/opt/zimbra/bin/zmprov grr global usr $2 +adminLoginAs
+$ZMPROV grr domain $DOMAIN usr $ACCOUNT +createAccount
+$ZMPROV grr domain $DOMAIN usr $ACCOUNT +createAlias
+$ZMPROV grr domain $DOMAIN usr $ACCOUNT +createCalendarResource
+$ZMPROV grr domain $DOMAIN usr $ACCOUNT +createDistributionList
+$ZMPROV grr domain $DOMAIN usr $ACCOUNT +deleteAlias
+$ZMPROV grr domain $DOMAIN usr $ACCOUNT +listDomain
+$ZMPROV grr domain $DOMAIN usr $ACCOUNT +domainAdminRights
+$ZMPROV grr domain $DOMAIN usr $ACCOUNT set.account.zimbraAccountStatus
+$ZMPROV grr domain $DOMAIN usr $ACCOUNT set.account.sn
+$ZMPROV grr domain $DOMAIN usr $ACCOUNT set.account.displayName
+$ZMPROV grr domain $DOMAIN usr $ACCOUNT set.account.zimbraPasswordMustChange
+$ZMPROV grr account $ACCOUNT usr $ACCOUNT +deleteAccount
+$ZMPROV grr account $ACCOUNT usr $ACCOUNT +getAccountInfo
+$ZMPROV grr account $ACCOUNT usr $ACCOUNT +getAccountMembership
+$ZMPROV grr account $ACCOUNT usr $ACCOUNT +getMailboxInfo
+$ZMPROV grr account $ACCOUNT usr $ACCOUNT +listAccount
+$ZMPROV grr account $ACCOUNT usr $ACCOUNT +removeAccountAlias
+$ZMPROV grr account $ACCOUNT usr $ACCOUNT +renameAccount
+$ZMPROV grr account $ACCOUNT usr $ACCOUNT +setAccountPassword
+$ZMPROV grr account $ACCOUNT usr $ACCOUNT +viewAccountAdminUI
+}
 
-/opt/zimbra/bin/zmprov grantRight domain $1 usr $2 +createAccount
-/opt/zimbra/bin/zmprov grantRight domain $1 usr $2 +createAlias
-/opt/zimbra/bin/zmprov grantRight domain $1 usr $2 +createCalendarResource
-/opt/zimbra/bin/zmprov grantRight domain $1 usr $2 +createDistributionList
-/opt/zimbra/bin/zmprov grantRight domain $1 usr $2 +deleteAlias
-/opt/zimbra/bin/zmprov grantRight domain $1 usr $2 +listDomain
-/opt/zimbra/bin/zmprov grantRight domain $1 usr $2 +domainAdminRights
-/opt/zimbra/bin/zmprov grantRight domain $1 usr $2 +configureQuota
-/opt/zimbra/bin/zmprov grantRight domain $1 usr $2 set.account.zimbraAccountStatus
-/opt/zimbra/bin/zmprov grantRight domain $1 usr $2 set.account.sn
-/opt/zimbra/bin/zmprov grantRight domain $1 usr $2 set.account.displayName
-/opt/zimbra/bin/zmprov grantRight domain $1 usr $2 set.account.zimbraPasswordMustChange
-/opt/zimbra/bin/zmprov grantRight domain $1 usr $2 getDomainQuotaUsage
-/opt/zimbra/bin/zmprov grantRight account $2 usr $2 +deleteAccount
-/opt/zimbra/bin/zmprov grantRight account $2 usr $2 +getAccountInfo
-/opt/zimbra/bin/zmprov grantRight account $2 usr $2 +getAccountMembership
-/opt/zimbra/bin/zmprov grantRight account $2 usr $2 +getMailboxInfo
-/opt/zimbra/bin/zmprov grantRight account $2 usr $2 +listAccount
-/opt/zimbra/bin/zmprov grantRight account $2 usr $2 +removeAccountAlias
-/opt/zimbra/bin/zmprov grantRight account $2 usr $2 +renameAccount
-/opt/zimbra/bin/zmprov grantRight account $2 usr $2 +setAccountPassword
-/opt/zimbra/bin/zmprov grantRight account $2 usr $2 +viewAccountAdminUI
-/opt/zimbra/bin/zmprov grantRight account $2 usr $2 +configureQuota
+viewMailAccount(){
+$ZMPROV grr global usr $ACCOUNT +listZimlet
+$ZMPROV grr global usr $ACCOUNT +modifyZimlet
+$ZMPROV grr global usr $ACCOUNT +adminLoginAs
 }
 viewDomainQuotaUsage(){
-/opt/zimbra/bin/zmprov grantRight domain $1 usr $2 +getDomainQuotaUsage
+$ZMPROV grr domain $DOMAIN usr $ACCOUNT +getDomainQuotaUsage
 }
 viewAllMailQueue(){
-/opt/zimbra/bin/zmprov grr global usr $2 +adminConsoleMailQueueRights
+$ZMPROV grr global usr $ACCOUNT +adminConsoleMailQueueRights
+}
+configQuotaAccount(){
+$ZMPROV ma $ACCOUNT zimbraDomainAdminMaxMailQuota 0
+$ZMPROV grr account $ACCOUNT usr $ACCOUNT +configureQuota
+}
+notManageZimletsAccount(){
+$ZMPROV grr domain $DOMAIN usr $ACCOUNT -setAdminConsoleAccountsZimlets
+$ZMPROV grr domain $DOMAIN usr $ACCOUNT -viewDomainAdminConsoleAccountsZimletsTab
+$ZMPROV grr domain $DOMAIN usr $ACCOUNT -viewAdminConsoleDomainZimletsTab
 }
 
 #=======================
 main(){
 basic
+viewMailAccount
 viewDomainQuotaUsage
+notManageZimletsAccount
 #viewAllMailQueue
+#configQuotaAccount
 }
 
+#=======================
 main
