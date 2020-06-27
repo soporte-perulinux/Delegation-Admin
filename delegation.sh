@@ -53,6 +53,7 @@ $ZMPROV ma $ACCOUNT zimbraDomainAdminMaxMailQuota 0
 $ZMPROV grr account $ACCOUNT usr $ACCOUNT +configureQuota
 }
 notManageZimletsAccount(){
+$ZMPROV grr global usr $ACCOUNT -adminConsoleZimletRights
 $ZMPROV grr domain $DOMAIN usr $ACCOUNT -setAdminConsoleAccountsZimletsTab
 $ZMPROV grr domain $DOMAIN usr $ACCOUNT -viewDomainAdminConsoleAccountsZimletsTab
 $ZMPROV grr domain $DOMAIN usr $ACCOUNT -viewAdminConsoleDomainZimletsTab
