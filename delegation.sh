@@ -13,7 +13,7 @@ fi
 
 basic(){
 $ZMPROV ma $ACCOUNT zimbraIsDelegatedAdminAccount TRUE
-$ZMPROV ma $ACCOUNT zimbraAdminConsoleUIComponents cartBlancheUI zimbraAdminConsoleUIComponents domainListView zimbraAdminConsoleUIComponents accountListView zimbraAdminConsoleUIComponents DLListView
+$ZMPROV ma $ACCOUNT zimbraAdminConsoleUIComponents accountListView zimbraAdminConsoleUIComponents DLListView zimbraAdminConsoleUIComponents aliasListView zimbraAdminConsoleUIComponents resourceListView zimbraAdminConsoleUIComponents domainListView
 
 $ZMPROV grr domain $DOMAIN usr $ACCOUNT +createAccount
 $ZMPROV grr domain $DOMAIN usr $ACCOUNT +createAlias
@@ -26,6 +26,12 @@ $ZMPROV grr domain $DOMAIN usr $ACCOUNT set.account.zimbraAccountStatus
 $ZMPROV grr domain $DOMAIN usr $ACCOUNT set.account.sn
 $ZMPROV grr domain $DOMAIN usr $ACCOUNT set.account.displayName
 $ZMPROV grr domain $DOMAIN usr $ACCOUNT set.account.zimbraPasswordMustChange
+
+$ZMPROV grr domain $DOMAIN usr $ACCOUNT -set.account.zimbraMailQuota
+$ZMPROV grr domain $DOMAIN usr $ACCOUNT -set.account.zimbraCOSId
+$ZMPROV grr domain $DOMAIN usr $ACCOUNT -set.domain.zimbraDomainDefaultCOSId
+
+
 $ZMPROV grr account $ACCOUNT usr $ACCOUNT +deleteAccount
 $ZMPROV grr account $ACCOUNT usr $ACCOUNT +getAccountInfo
 $ZMPROV grr account $ACCOUNT usr $ACCOUNT +getAccountMembership
@@ -53,7 +59,7 @@ $ZMPROV ma $ACCOUNT zimbraDomainAdminMaxMailQuota 0
 $ZMPROV grr account $ACCOUNT usr $ACCOUNT +configureQuota
 }
 notManageZimletsAccount(){
-$ZMPROV grr global usr $ACCOUNT -adminConsoleZimletRights
+#$ZMPROV grr global usr $ACCOUNT -adminConsoleZimletRights
 $ZMPROV grr domain $DOMAIN usr $ACCOUNT -setAdminConsoleAccountsZimletsTab
 $ZMPROV grr domain $DOMAIN usr $ACCOUNT -viewDomainAdminConsoleAccountsZimletsTab
 $ZMPROV grr domain $DOMAIN usr $ACCOUNT -viewAdminConsoleDomainZimletsTab
@@ -71,3 +77,8 @@ notManageZimletsAccount
 
 #=======================
 main
+
+#=======================
+# Get Rigths (https://wiki.zimbra.com/wiki/UmaT-Implementing-Delegated-Administration)
+# zmprov gg -g usr admin@domain.com | grep ^global | awk '{print $1,$3,$5,$6}'
+# zmprov gg -g usr admin@domain.com | grep ^domain | awk '{print $1,$3,$4,$6,$7}'
